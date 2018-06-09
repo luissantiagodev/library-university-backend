@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
-const Book = require('../models/Book')
+const Career = require('../models/Career')
 const PORT = process.env.PORT || 8000;
 
 router.get('/', (req, res) => {
-    Book
+    Career
         .find()
-        .select('publisher title num_of_edicion ISBN author')
+        .select('name')
         .exec()
         .then(docs => {
             const response = {
@@ -16,11 +16,7 @@ router.get('/', (req, res) => {
                 data : docs.map(doc=>{
                     return {
                         id : doc.id,
-                        publisher : doc.publisher,
-                        title : doc.title,
-                        num_of_edicion : doc.num_of_edicion,
-                        ISBN : doc.ISBN,
-                        author : doc.author
+                        name : doc.name,
                     }
                 })
             }
@@ -35,32 +31,20 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    console.log("POST a BOOK")
-    const book = new Book({
+    console.log("POST career")
+    const career = new Career({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        id : req.body.id,
-        publisher : req.body.publisher,
-        title : req.body.title,
-        num_of_edicion : req.body.num_of_edicion,
-        ISBN : req.body.ISBN,
-        author : req.body.author
     })
 
-    book.save().then(result => {
+    career.save().then(result => {
         console.log(result)
         res.status(200).json({
-            message: "Created Book succesfully",
+            message: "Created student succesfully",
             sucess : true,
-            createdBook : {
+            createdCareer : {
                 id : result.id,
-                name: result.name,
-                id : result.id,
-                publisher : result.publisher,
-                title : result.title,
-                num_of_edicion : result.num_of_edicion,
-                ISBN : result.ISBN,
-                author : result.author
+                name : result.name,
             }
         })
     }).catch(error => {
@@ -72,24 +56,24 @@ router.post('/', (req, res) => {
 })
 
 router.patch('/:id', (req, res) => {
-    const bookId = req.params.id
+    const careerId = req.params.id
     const updateOps = {}
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value
     }
-    Book.update({
-            _id: bookId
+    Career.update({
+            _id: careerId
         }, {
             $set: updateOps
         })
         .exec()
         .then(docs=>{
             let response = {
-                message : "Book updated succesfully",
+                message : "Career updated succesfully",
                 sucess : true,
                 request : {
                     type : "GET",
-                    url : `http://localhost:${PORT}/books`
+                    url : `http://localhost:${PORT}/careers`
                 }
             }
             res.status(200).json(docs)
@@ -105,15 +89,15 @@ router.patch('/:id', (req, res) => {
 })
 
 router.delete('/:id', (req, res) => {
-    const bookId = req.params.id
-    Book.remove({
+    const careerId = req.params.id
+    Career.remove({
             _id: studentId
         })
         .exec()
         .then(docs => {
             console.log(docs)
             res.status(200).json({
-                message: "Book has deleted succesfully",
+                message: "Career has deleted succesfully",
                 sucess : true,
                 meta_data: docs
             })

@@ -5,4 +5,4 @@ const careerSchema = mongoose.Schema({
     name : {type : String , require : true},
 })
 
-module.exports = mongoose.model('Proyector' , careerSchema)
+module.exports = mongoose.model('Career' , careerSchema)
