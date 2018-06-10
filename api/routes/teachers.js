@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose')
 const Teacher = require('../models/Teacher')
 const PORT = process.env.PORT || 8000;
+const bycript = require('bcrypt')
 
 router.get('/', (req, res) => {
     Teacher
@@ -38,44 +39,55 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    console.log("POST TEACHER")
-    const teacher = new Teacher({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        matricula: req.body.matricula,
-        phoneNumber: req.body.phoneNumber,
-        password: req.body.password
-    })
-    teacher.save().then(result => {
-        console.log(result)
-        res.status(200).json({
-            message: "Created TEACHER succesfully",
-            sucess : true,
-            createdTeacher : {
-                id : result.id,
-                name : result.name,
-                matricula : result.matricula,
-                phoneNumber : result.phoneNumber,
-                password : result.password,
-                request : {
-                    type : "GET",
-                    url : `http://localhost:${PORT}/teachers/${result.id}`
-                }
+    router.post('/', (req, res) => {
+        console.log("POST TEACHER")
+        bycript.hash(req.body.password , 10 , (err , hash)=>{
+            if(err){
+                res.status(500).json({
+                    error: error
+                }) 
+            }else{
+                const teacher = new Teacher({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: req.body.name,
+                    matricula: req.body.matricula,
+                    phoneNumber: req.body.phoneNumber,
+                    password: hash
+                }) 
             }
-        })
-    }).catch(error => {
-        console.log(error)
-        res.status(500).json({
-            error: error
+            teacher.save().then(result => {
+                console.log(result)
+                res.status(200).json({
+                    message: "Created student succesfully",
+                    sucess : true,
+                    createdStudent : {
+                        id : result.id,
+                        name : result.name,
+                        matricula : result.matricula,
+                        phoneNumber : result.phoneNumber,
+                        password : result.password,
+                        request : {
+                            type : "GET",
+                            url : `http://localhost:${PORT}/students/${result.id}`
+                        }
+                    }
+                })
+            }).catch(error => {
+                console.log(error)
+                res.status(500).json({
+                    error: error
+                })
+            })
         })
     })
+    
 })
 
 router.get('/:id', (req, res) => {
     const teacherId = req.params.id
     Teacher.findById(studentId)
-        .exec()
         .select('name matricula phoneNumber password')
+        .exec()
         .then(result => {
             if (result) {
                 const response = {

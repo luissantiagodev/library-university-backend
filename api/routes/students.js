@@ -1,9 +1,10 @@
-
 const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
 const Student = require('../models/Student')
 const PORT = process.env.PORT || 8000;
+const bycript = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 router.get('/', (req, res) => {
     Student
@@ -40,43 +41,65 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log("POST STUDENTS")
-    const student = new Student({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        matricula: req.body.matricula,
-        phoneNumber: req.body.phoneNumber,
-        password: req.body.password
-    })
-    student.save().then(result => {
-        console.log(result)
-        res.status(200).json({
-            message: "Created student succesfully",
-            sucess : true,
-            createdStudent : {
-                id : result.id,
-                name : result.name,
-                matricula : result.matricula,
-                phoneNumber : result.phoneNumber,
-                password : result.password,
-                request : {
-                    type : "GET",
-                    url : `http://localhost:${PORT}/students/${result.id}`
-                }
+    Student.find({matricula : req.body.matricula})
+        .exec()
+        .then(user=>{
+            if(user.length >= 1){
+                return res.status(409).json({
+                    sucess : false,
+                    message : "MATRICULA ALREADY EXIST"
+                })
+            }else{
+                bycript.hash(req.body.password , 10 , (err , hash)=>{
+                    if(err){
+                        res.status(500).json({
+                            error: error
+                        }) 
+                    }else{
+                        const student = new Student({
+                            _id: new mongoose.Types.ObjectId(),
+                            name: req.body.name,
+                            matricula: req.body.matricula,
+                            phoneNumber: req.body.phoneNumber,
+                            career : req.body.career,
+                            password: hash
+                        }) 
+                    }
+                    student.save().then(result => {
+                        console.log(result)
+                        res.status(200).json({
+                            message: "Created student succesfully",
+                            sucess : true,
+                            createdStudent : {
+                                id : result.id,
+                                name : result.name,
+                                matricula : result.matricula,
+                                phoneNumber : result.phoneNumber,
+                                password : result.password,
+                                career : resultcareer,
+                                request : {
+                                    type : "GET",
+                                    url : `http://localhost:${PORT}/students/${result.id}`
+                                }
+                            }
+                        })
+                    }).catch(error => {
+                        console.log(error)
+                        res.status(500).json({
+                            error: error,
+                            sucess : false
+                        })
+                    })
+                })
             }
         })
-    }).catch(error => {
-        console.log(error)
-        res.status(500).json({
-            error: error
-        })
-    })
 })
 
 router.get('/:id', (req, res) => {
     const studentId = req.params.id
     Student.findById(studentId)
-        .exec()
         .select('name matricula phoneNumber password')
+        .exec()
         .then(result => {
             if (result) {
                 const response = {
@@ -166,6 +189,44 @@ router.delete('/:id', (req, res) => {
                 error: err
             })
         })
+})
+
+
+router.post('/signup' , (req , res)=>{
+    Student.find({matricula : req.body.matricula})
+    .exec()
+    .then(users=>{
+        if(users.length < 1){
+            res.status(401).json({
+                error: "Authed failed"
+            })
+        }
+
+        bycript.compare(req.body.password , users[0].password , (error , result)=>{
+            if(error){
+                res.status(401).json({
+                    error: "Authed failed"
+                })
+            }
+
+            if(result){
+                const token = jwt.sign({
+                   matricula : users[0].matricula,
+                   userId : users[0]._id
+                },"secret" , {
+                    expiresIn : "1h"
+                })
+                res.status(200).json({
+                    error: "Authed sucesfull",
+                    token : token
+                })
+            }
+
+            res.status(401).json({
+                error: "Authed failed"
+            })
+        })
+    })
 })
 
 
