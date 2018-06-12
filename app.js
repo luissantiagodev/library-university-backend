@@ -9,7 +9,9 @@ const studentRoutes = require('./api/routes/students')
 const teacherRoutes = require('./api/routes/teachers')
 const careerRoutes = require('./api/routes/careers')
 const bookRoutes = require('./api/routes/books')
-const proyectos = require('./api/routes/proyectors')
+const proyectoresRoutes = require('./api/routes/proyectors')
+const orderProyectorRoutes = require('./api/routes/orderProyector.js')
+const orderBooksRoutes = require('./api/routes/orderBooks.js.js')
 
 //Express setup
 app.use(morgan('combined'))
@@ -20,7 +22,9 @@ app.use('/students' , studentRoutes)
 app.use('/teachers' , teacherRoutes)
 app.use('/careers' , careerRoutes)
 app.use('/books' , bookRoutes)
-app.use('/proyectors' ,proyectos )
+app.use('/proyectors' ,proyectoresRoutes)
+app.use('/orderProyector' , orderProyectorRoutes)
+app.use('/orderBooks' , orderBooksRoutes)
 
 app.get('/', (req, res) => {
   res.json({
