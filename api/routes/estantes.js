@@ -1,13 +1,14 @@
 const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
-const Book = require('../models/Book')
+const Estante = require('../models/Estante.js')
 const PORT = process.env.PORT || 8000;
 
 router.get('/', (req, res) => {
-    Book
+    Estante
         .find()
-        .select('publisher title num_of_edicion ISBN author estante facePosition level')
+        .populate()
+        .select('name level career')
         .exec()
         .then(docs => {
             const response = {
@@ -16,14 +17,9 @@ router.get('/', (req, res) => {
                 data : docs.map(doc=>{
                     return {
                         id : doc.id,
-                        publisher : doc.publisher,
-                        title : doc.title,
-                        num_of_edicion : doc.num_of_edicion,
-                        ISBN : doc.ISBN,
-                        author : doc.author,
-                        estante : doc.estante,
-                        facePosition : doc.facePosition,
-                        level : doc.level
+                        name : doc.name,
+                        level : doc.level,
+                        career : doc.career,
                     }
                 })
             }
@@ -38,36 +34,23 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    console.log("POST a BOOK")
-    const book = new Book({
+    console.log("POST a Estante")
+    const estante = new Estante({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        publisher : req.body.publisher,
-        title : req.body.title,
-        num_of_edicion : req.body.num_of_edicion,
-        ISBN : req.body.ISBN,
-        author : req.body.author,
-        estante : req.body.estante,
-        facePosition : req.body.facePosition,
-        level : req.body.level
+        level : doc.level,
+        career : doc.career
     })
 
-    book.save().then(result => {
+    estante.save().then(result => {
         console.log(result)
         res.status(200).json({
-            message: "Created Book succesfully",
+            message: "Created Estante succesfully",
             sucess : true,
-            createdBook : {
+            createdEstante : {
                 id : result.id,
                 name: result.name,
-                publisher : result.publisher,
-                title : result.title,
-                num_of_edicion : result.num_of_edicion,
-                ISBN : result.ISBN,
-                author : result.author,
-                estante : result.estante,
-                facePosition : result.facePosition,
-                level : result.level
+                estante : result.estante
             }
         })
     }).catch(error => {
@@ -79,20 +62,20 @@ router.post('/', (req, res) => {
 })
 
 router.patch('/:id', (req, res) => {
-    const bookId = req.params.id
+    const estanteId = req.params.id
     const updateOps = {}
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value
     }
     Book.update({
-            _id: bookId
+            _id: estanteId
         }, {
             $set: updateOps
         })
         .exec()
         .then(docs=>{
             let response = {
-                message : "Book updated succesfully",
+                message : "Estante updated succesfully",
                 sucess : true,
                 request : {
                     type : "GET",
@@ -112,15 +95,15 @@ router.patch('/:id', (req, res) => {
 })
 
 router.delete('/:id', (req, res) => {
-    const bookId = req.params.id
+    const estanteId = req.params.id
     Book.remove({
-            _id: bookId
+            _id: estanteId
         })
         .exec()
         .then(docs => {
             console.log(docs)
             res.status(200).json({
-                message: "Book has deleted succesfully",
+                message: "Estante has deleted succesfully",
                 sucess : true,
                 meta_data: docs
             })

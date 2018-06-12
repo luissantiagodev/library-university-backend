@@ -7,6 +7,9 @@ const bookSchema = mongoose.Schema({
     num_of_edicion : {type : Number , require : true},
     ISBN : {type : String , require : true},
     author : {type : String , require : true},
+    estante : {type : mongoose.Schema.Types.ObjectId , ref : 'Estante'  , require : true},
+    facePosition : {type : String , require : true},
+    level : {type : String , require : true},
 })
 
 module.exports = mongoose.model('Book' , bookSchema)
