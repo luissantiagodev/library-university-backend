@@ -8,7 +8,7 @@ const Book = require('../models/Book')
 router.get('/', (req, res) => {
     OrderBook
         .find()
-        .select('book student teacher date_from date_final')
+        .select('book student teacher date_from date_final status')
         .populate()
         .exec()
         .then(docs => {
@@ -23,6 +23,7 @@ router.get('/', (req, res) => {
                         teacher : doc.teacher,
                         date_from : doc.date_from,
                         date_final : doc.date_final,
+                        status : doc.status,
                         request:{
                             type : "GET",
                             url : `localhost:${PORT}/orderBooks/${doc.id}`
@@ -59,7 +60,7 @@ router.post('/', (req, res) => {
                 date_final : req.body.date_final,
             })
             return orderBook.save()
-        }).then(()=>{
+        }).then((result)=>{
             console.log(result)
             res.status(200).json({
                 message: "Created Order book succesfully",
@@ -71,12 +72,15 @@ router.post('/', (req, res) => {
                     teacher : result.teacher,
                     date_from : result.date_from,
                     date_final : result.date_final,
+                    status : result.status
                 }
             })
         }).catch((error)=>{
             res.status(500).json({
                 error : error
             })
+
+            console.log(error)
         })
 })
 

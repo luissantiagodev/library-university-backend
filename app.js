@@ -11,8 +11,8 @@ const careerRoutes = require('./api/routes/careers')
 const bookRoutes = require('./api/routes/books')
 const proyectoresRoutes = require('./api/routes/proyectors')
 const orderProyectorRoutes = require('./api/routes/orderProyector.js')
-const orderBooksRoutes = require('./api/routes/orderBooks.js.js')
-
+const orderBooksRoutes = require('./api/routes/orderBooks.js')
+const estantesRoutes = require('./api/routes/estantes')
 //Express setup
 app.use(morgan('combined'))
 app.use(cors())
@@ -25,6 +25,7 @@ app.use('/books' , bookRoutes)
 app.use('/proyectors' ,proyectoresRoutes)
 app.use('/orderProyector' , orderProyectorRoutes)
 app.use('/orderBooks' , orderBooksRoutes)
+app.use('/estantes' , estantesRoutes)
 
 app.get('/', (req, res) => {
   res.json({

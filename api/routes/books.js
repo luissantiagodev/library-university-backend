@@ -37,6 +37,46 @@ router.get('/', (req, res) => {
         })
 })
 
+
+router.get('/:id', (req, res) => {
+    const bookId = req.params.id
+    Book.findById(bookId)
+        .select('publisher title num_of_edicion ISBN author estante facePosition level')
+        .exec()
+        .then(docs => {
+            if (docs) {
+                console.log(docs)
+                const response = {
+                    count : docs.length,
+                    sucess : true,
+                    data : {
+                        id : docs.id,
+                        publisher : docs.publisher,
+                        title : docs.title,
+                        num_of_edicion : docs.num_of_edicion,
+                        ISBN : docs.ISBN,
+                        author : docs.author,
+                        estante : docs.estante,
+                        facePosition : docs.facePosition,
+                        level : docs.level
+                    }
+                }
+                res.status(200).json(response) 
+            } else {
+                res.status(404).json({
+                    message: "No valid entry found provided ID"
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
+        })
+})
+
+
 router.post('/', (req, res) => {
     console.log("POST a BOOK")
     const book = new Book({

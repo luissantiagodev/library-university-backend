@@ -30,17 +30,49 @@ router.get('/', (req, res) => {
         })
 })
 
+
+
+router.get('/:id', (req, res) => {
+    const careerId = req.params.id
+    Career.findById(careerId)
+        .select('name')
+        .exec()
+        .then(docs => {
+            if (docs) {
+                console.log(docs)
+                const response = {
+                    count : docs.length,
+                    sucess : true,
+                    data : {
+                            id : docs.id,
+                            name : docs.name,
+                    }
+                }
+                res.status(200).json(response)
+            } else {
+                res.status(404).json({
+                    message: "No valid entry found provided ID"
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
+        })
+})
+
 router.post('/', (req, res) => {
     console.log("POST career")
     const career = new Career({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
     })
-
     career.save().then(result => {
         console.log(result)
         res.status(200).json({
-            message: "Created student succesfully",
+            message: "Created Carrer succesfully",
             sucess : true,
             createdCareer : {
                 id : result.id,

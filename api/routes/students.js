@@ -9,19 +9,21 @@ const jwt = require('jsonwebtoken')
 router.get('/', (req, res) => {
     Student
         .find()
-        .select('name matricula phoneNumber password')
+        .select('name matricula phoneNumber password career')
         .exec()
         .then(docs => {
             const response = {
                 count : docs.length,
                 sucess : true,
                 data : docs.map(doc=>{
+                    console.log(doc.career)
                     return {
                         id : doc.id,
                         name : doc.name,
                         matricula : doc.matricula,
                         phoneNumber : doc.phoneNumber,
                         password : doc.password,
+                        career : doc.career,
                         request : {
                             type : "GET",
                             url : `http://localhost:${PORT}/students/${doc.id}`
@@ -50,45 +52,35 @@ router.post('/', (req, res) => {
                     message : "MATRICULA ALREADY EXIST"
                 })
             }else{
-                bycript.hash(req.body.password , 10 , (err , hash)=>{
-                    if(err){
-                        res.status(500).json({
-                            error: error
-                        }) 
-                    }else{
-                        const student = new Student({
-                            _id: new mongoose.Types.ObjectId(),
-                            name: req.body.name,
-                            matricula: req.body.matricula,
-                            phoneNumber: req.body.phoneNumber,
-                            career : req.body.career,
-                            password: hash
-                        }) 
-                    }
-                    student.save().then(result => {
-                        console.log(result)
-                        res.status(200).json({
-                            message: "Created student succesfully",
-                            sucess : true,
-                            createdStudent : {
-                                id : result.id,
-                                name : result.name,
-                                matricula : result.matricula,
-                                phoneNumber : result.phoneNumber,
-                                password : result.password,
-                                career : resultcareer,
-                                request : {
-                                    type : "GET",
-                                    url : `http://localhost:${PORT}/students/${result.id}`
-                                }
+                const student = new Student({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: req.body.name,
+                    matricula: req.body.matricula,
+                    phoneNumber: req.body.phoneNumber,
+                    career : req.body.career,
+                }) 
+                student.save().then(result => {
+                    console.log(result)
+                    res.status(200).json({
+                        message: "Created student succesfully",
+                        sucess : true,
+                        createdStudent : {
+                            id : result.id,
+                            name : result.name,
+                            matricula : result.matricula,
+                            phoneNumber : result.phoneNumber,
+                            career : result.career,
+                            request : {
+                                type : "GET",
+                                url : `http://localhost:${PORT}/students/${result.id}`
                             }
-                        })
-                    }).catch(error => {
-                        console.log(error)
-                        res.status(500).json({
-                            error: error,
-                            sucess : false
-                        })
+                        }
+                    })
+                }).catch(error => {
+                    console.log(error)
+                    res.status(500).json({
+                        error: error,
+                        sucess : false
                     })
                 })
             }
@@ -98,7 +90,7 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
     const studentId = req.params.id
     Student.findById(studentId)
-        .select('name matricula phoneNumber password')
+        .select('name matricula phoneNumber password career')
         .exec()
         .then(result => {
             if (result) {

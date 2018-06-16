@@ -5,10 +5,8 @@ const bookSchema = mongoose.Schema({
     title : {type : String , require : true},
     publisher : {type : String , require : true},
     num_of_edicion : {type : Number , require : true},
-    ISBN : {type : String , require : true},
     author : {type : String , require : true},
     estante : {type : mongoose.Schema.Types.ObjectId , ref : 'Estante'  , require : true},
-    facePosition : {type : String , require : true},
     level : {type : String , require : true},
 })
 

@@ -8,19 +8,21 @@ router.get('/', (req, res) => {
     Estante
         .find()
         .populate()
-        .select('name level career')
+        .select('name level career cara')
         .exec()
         .then(docs => {
             const response = {
                 count : docs.length,
                 sucess : true,
                 data : docs.map(doc=>{
-                    return {
-                        id : doc.id,
-                        name : doc.name,
-                        level : doc.level,
-                        career : doc.career,
-                    }
+                    return(
+                        {
+                            id : doc.id,
+                            name : doc.name,
+                            level : doc.level,
+                            career : doc.career,
+                        }
+                    )
                 })
             }
             res.status(200).json(response)
@@ -35,13 +37,16 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log("POST a Estante")
+    console.log(req.body.cara)
     const estante = new Estante({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        level : doc.level,
-        career : doc.career
+        level : req.body.level,
+        cara: req.body.cara,
+        career : req.body.career,
     })
 
+    console.log(estante)
     estante.save().then(result => {
         console.log(result)
         res.status(200).json({
@@ -50,7 +55,8 @@ router.post('/', (req, res) => {
             createdEstante : {
                 id : result.id,
                 name: result.name,
-                estante : result.estante
+                estante : result.estante,
+                cara : result.cara
             }
         })
     }).catch(error => {
@@ -61,13 +67,49 @@ router.post('/', (req, res) => {
     })
 })
 
+
+
+router.get('/:id', (req, res) => {
+    const estanteId = req.params.id
+    Estante.findById(estanteId)
+        .select('name level career cara')
+        .exec()
+        .then(docs => {
+            if (docs) {
+                console.log(docs)
+                const response = {
+                    count : docs.length,
+                    sucess : true,
+                    data : {
+                        id : docs.id,
+                        name : docs.name,
+                        level : docs.level,
+                        career : docs.career,
+                    }
+                }
+                res.status(200).json(response) 
+            } else {
+                res.status(404).json({
+                    message: "No valid entry found provided ID"
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
+        })
+})
+
+
 router.patch('/:id', (req, res) => {
     const estanteId = req.params.id
     const updateOps = {}
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value
     }
-    Book.update({
+    Estante.update({
             _id: estanteId
         }, {
             $set: updateOps
@@ -96,7 +138,7 @@ router.patch('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     const estanteId = req.params.id
-    Book.remove({
+    Estante.remove({
             _id: estanteId
         })
         .exec()
