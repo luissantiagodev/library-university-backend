@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const OrderBook = require('../models/OrderBook')
 const PORT = process.env.PORT || 8000;
 const Book = require('../models/Book')
+const moment = require('moment')
 
 router.get('/', (req, res) => {
     OrderBook
@@ -40,6 +41,66 @@ router.get('/', (req, res) => {
             })
         })
 })
+
+
+router.get('/reporte/:start/:end' , (req , res)=>{
+    let startDateReq = req.params.start
+    let endDateReq = req.params.end
+    OrderBook
+        .find()
+        .select('book student teacher date_from date_final status')
+        .populate()
+        .exec()
+        .then(docs => {
+            const response = {
+                count : docs.length,
+                sucess : true,
+                data : docs.filter(doc=>{
+                    var compareDate = moment(doc.date_from);
+                    var startDate   = moment(startDateReq);
+                    var endDate     = moment(endDateReq);
+
+                    console.log(`THE ORIGINAL DATE : ${compareDate} HAS TO BE BETWEN ${startDate} AND ${endDate}`)
+                    console.log(compareDate.isBetween(startDate, endDate))
+                    if(compareDate.isBetween(startDate, endDate)){
+                        return {
+                            id : doc.id,
+                            book : doc.book,
+                            student : doc.student,
+                            teacher : doc.teacher,
+                            date_from : doc.date_from,
+                            date_final : doc.date_final,
+                            status : doc.status,
+                            request:{
+                                type : "GET",
+                                url : `localhost:${PORT}/orderBooks/${doc.id}`
+                            }
+                        }   
+                    }else{
+                        return false;
+                    }
+                }),
+            }
+            res.status(200).json(response)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
+        })
+})
+
+function getDates(startDate, stopDate) {
+    var dateArray = [];
+    var currentDate = moment(startDate);
+    var stopDate = moment(stopDate);
+    while (currentDate <= stopDate) {
+        dateArray.push( moment(currentDate).format('YYYY-MM-DD') )
+        currentDate = moment(currentDate).add(1, 'days');
+    }
+    return dateArray;
+}
 
 router.post('/', (req, res) => {
     console.log("POST OrderBook")
@@ -149,6 +210,10 @@ router.delete('/:id', (req, res) => {
             })
         })
 })
+
+
+
+
 
 
 module.exports = router

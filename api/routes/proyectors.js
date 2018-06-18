@@ -32,12 +32,13 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log("POST PROYECTOR")
-    const career = new Proyector({
+    const proyector = new Proyector({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
+        model : req.body.model
     })
 
-    career.save().then(result => {
+    proyector.save().then(result => {
         console.log(result)
         res.status(200).json({
             message: "Created PROYECTOR succesfully",
@@ -45,6 +46,7 @@ router.post('/', (req, res) => {
             createdProyector : {
                 id : result.id,
                 name : result.name,
+                model : result.model
             }
         })
     }).catch(error => {

@@ -8,6 +8,7 @@ const bookSchema = mongoose.Schema({
     author : {type : String , require : true},
     estante : {type : mongoose.Schema.Types.ObjectId , ref : 'Estante'  , require : true},
     level : {type : String , require : true},
+    quantity : {type : Number , require : true},
 })
 
 module.exports = mongoose.model('Book' , bookSchema)

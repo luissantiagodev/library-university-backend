@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8000;
 router.get('/', (req, res) => {
     Book
         .find()
-        .select('publisher title num_of_edicion ISBN author estante facePosition level')
+        .select('publisher title num_of_edicion ISBN author estante facePosition level quantity')
         .exec()
         .then(docs => {
             const response = {
@@ -23,7 +23,8 @@ router.get('/', (req, res) => {
                         author : doc.author,
                         estante : doc.estante,
                         facePosition : doc.facePosition,
-                        level : doc.level
+                        level : doc.level,
+                        quantity : doc.quantity
                     }
                 })
             }
@@ -41,7 +42,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     const bookId = req.params.id
     Book.findById(bookId)
-        .select('publisher title num_of_edicion ISBN author estante facePosition level')
+        .select('publisher title num_of_edicion ISBN author estante facePosition level quantity')
         .exec()
         .then(docs => {
             if (docs) {
@@ -58,7 +59,8 @@ router.get('/:id', (req, res) => {
                         author : docs.author,
                         estante : docs.estante,
                         facePosition : docs.facePosition,
-                        level : docs.level
+                        level : docs.level,
+                        quantity : docs.quantity
                     }
                 }
                 res.status(200).json(response) 
@@ -89,7 +91,8 @@ router.post('/', (req, res) => {
         author : req.body.author,
         estante : req.body.estante,
         facePosition : req.body.facePosition,
-        level : req.body.level
+        level : req.body.level,
+        quantity : req.body.quantity
     })
 
     book.save().then(result => {
@@ -107,7 +110,8 @@ router.post('/', (req, res) => {
                 author : result.author,
                 estante : result.estante,
                 facePosition : result.facePosition,
-                level : result.level
+                level : result.level,
+                quantity : result.quantity
             }
         })
     }).catch(error => {

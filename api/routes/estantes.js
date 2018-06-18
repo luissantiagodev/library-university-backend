@@ -21,6 +21,7 @@ router.get('/', (req, res) => {
                             name : doc.name,
                             level : doc.level,
                             career : doc.career,
+                            cara : doc.cara
                         }
                     )
                 })
