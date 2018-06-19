@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
     Book
         .find()
         .select('publisher title num_of_edicion ISBN author estante facePosition level quantity')
+        .populate('estante')
         .exec()
         .then(docs => {
             const response = {
@@ -44,6 +45,7 @@ router.get('/:id', (req, res) => {
     Book.findById(bookId)
         .select('publisher title num_of_edicion ISBN author estante facePosition level quantity')
         .exec()
+        .populate('estante')
         .then(docs => {
             if (docs) {
                 console.log(docs)

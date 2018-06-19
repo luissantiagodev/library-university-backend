@@ -8,8 +8,8 @@ const Proyector = require('../models/Proyector.js')
 router.get('/', (req, res) => {
     OrderProyector
         .find()
-        .select('proyector teacher date schedule place')
-        .populate()
+        .select('proyector teacher date initialHour finalHour place')
+        .populate('proyector teacher')
         .exec()
         .then(docs => {
             const response = {
@@ -21,7 +21,8 @@ router.get('/', (req, res) => {
                         proyector : doc.proyector,
                         teacher : doc.teacher,
                         date : doc.date,
-                        schedule : doc.schedule,
+                        initialHour : doc.initialHour,
+                        finalHour : doc.finalHour,
                         place : doc.place,
                         request:{
                             type : "GET",
@@ -42,7 +43,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log("POST OrderProyector")
-    Book.findById(req.body.proyector)
+    OrderProyector.find({id:req.body.proyector})
         .then((proyector)=>{
             if(!proyector){
                 return res.status(404).json({
@@ -54,12 +55,13 @@ router.post('/', (req, res) => {
                 _id: new mongoose.Types.ObjectId(),
                 proyector : req.body.proyector,
                 teacher : req.body.teacher,
-                date : req.body.date,
-                schedule : req.body.schedule,
+                date : Date().toString(),
                 place : req.body.place,
+                initialHour : req.body.initialHour,
+                finalHour : req.body.finalHour,
             })
             return orderProyector.save()
-        }).then(()=>{
+        }).then((result)=>{
             console.log(result)
             res.status(200).json({
                 message: "Created Order proyectors succesfully",
@@ -69,11 +71,14 @@ router.post('/', (req, res) => {
                     proyector : result.proyector,
                     teacher : result.teacher,
                     date : result.date,
-                    schedule : result.schedule,
+                    initialHour : result.initialHour,
+                    finalHour : result.finalHour,
                     place : result.place,
                 }
             })
         }).catch((error)=>{
+            console.log(error)
+            console.log("Sengin error")
             res.status(500).json({
                 error : error
             })
@@ -84,7 +89,8 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
     const orderProyector = req.params.id
     OrderProyector.findById(orderProyector)
-        .populate()
+        .select('proyector teacher date initialHour finalHour place')
+        .populate('proyector teacher')
         .exec()
         .then(result => {
             if (result) {
@@ -95,7 +101,8 @@ router.get('/:id', (req, res) => {
                         proyector : result.proyector,
                         teacher : result.teacher,
                         date : result.date,
-                        schedule : result.schedule,
+                        initialHour : result.initialHour,
+                        finalHour : result.finalHour,
                         place : result.place,
                     },
                     request : {

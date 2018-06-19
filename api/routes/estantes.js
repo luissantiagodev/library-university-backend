@@ -7,8 +7,8 @@ const PORT = process.env.PORT || 8000;
 router.get('/', (req, res) => {
     Estante
         .find()
-        .populate()
         .select('name level career cara')
+        .populate('career')
         .exec()
         .then(docs => {
             const response = {
@@ -75,6 +75,7 @@ router.get('/:id', (req, res) => {
     Estante.findById(estanteId)
         .select('name level career cara')
         .exec()
+        .populate('career')
         .then(docs => {
             if (docs) {
                 console.log(docs)

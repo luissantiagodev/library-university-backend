@@ -13,6 +13,8 @@ const proyectoresRoutes = require('./api/routes/proyectors')
 const orderProyectorRoutes = require('./api/routes/orderProyector.js')
 const orderBooksRoutes = require('./api/routes/orderBooks.js')
 const estantesRoutes = require('./api/routes/estantes')
+const pdfMakePrinter = require('pdfmake')
+
 //Express setup
 app.use(morgan('combined'))
 app.use(cors())
